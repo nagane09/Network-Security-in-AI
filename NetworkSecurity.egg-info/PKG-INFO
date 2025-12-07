@@ -1,0 +1,12 @@
+Metadata-Version: 2.1
+Name: NetworkSecurity
+Version: 0.0.1
+Author: Vaishnavi Nagane
+Author-email: vaishnavinagane986@gmail.com
+Requires-Dist: python-dotenv
+Requires-Dist: pandas
+Requires-Dist: numpy
+Requires-Dist: pymongo
+Requires-Dist: pymongo[srv]
+Requires-Dist: certifi
+Requires-Dist: scikit-learn

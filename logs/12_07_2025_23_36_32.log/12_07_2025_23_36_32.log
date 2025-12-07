@@ -1,0 +1,20 @@
+[ 2025-12-07 23:36:32,959 ] 161 numexpr.utils - INFO - NumExpr defaulting to 8 threads.
+[ 2025-12-07 23:36:46,120 ] 35 root - INFO - Start data ingestion
+[ 2025-12-07 23:36:48,321 ] 65 root - INFO - Performed train test split on the dataframe
+[ 2025-12-07 23:36:48,321 ] 67 root - INFO - Exited split_data_as_train_test method of Data_Ingestion class
+[ 2025-12-07 23:36:48,322 ] 75 root - INFO - Exporting train and test file path.
+[ 2025-12-07 23:36:48,460 ] 84 root - INFO - Exported train and test file path.
+[ 2025-12-07 23:36:48,461 ] 38 root - INFO - Data ingestion completed and artifact: DataIngestionArtifact(trained_file_path='Artifacts\\12_07_2025_23_36_33\\data_ingestion\\ingested\\train.csv', test_file_path='Artifacts\\12_07_2025_23_36_33\\data_ingestion\\ingested\\test.csv')
+[ 2025-12-07 23:36:48,472 ] 50 root - INFO - Start data validation
+[ 2025-12-07 23:36:48,621 ] 32 root - INFO - Required number of columns:2
+[ 2025-12-07 23:36:48,621 ] 33 root - INFO - Data frame has columns:31
+[ 2025-12-07 23:36:48,621 ] 32 root - INFO - Required number of columns:2
+[ 2025-12-07 23:36:48,621 ] 33 root - INFO - Data frame has columns:31
+[ 2025-12-07 23:36:48,934 ] 63 root - INFO - Entered initiate_data_transformation method of DataTransformation class
+[ 2025-12-07 23:36:48,934 ] 65 root - INFO - Starting data transformation
+[ 2025-12-07 23:36:48,969 ] 48 root - INFO - Entered get_data_trnasformer_object method of Trnasformation class
+[ 2025-12-07 23:36:48,969 ] 53 root - INFO - Initialise KNNImputer with {'missing_values': nan, 'n_neighbors': 3, 'weights': 'uniform'}
+[ 2025-12-07 23:36:48,991 ] 46 root - INFO - Entered the save_object method of MainUtils class
+[ 2025-12-07 23:36:48,996 ] 50 root - INFO - Exited the save_object method of MainUtils class
+[ 2025-12-07 23:36:48,996 ] 46 root - INFO - Entered the save_object method of MainUtils class
+[ 2025-12-07 23:36:48,999 ] 50 root - INFO - Exited the save_object method of MainUtils class
