@@ -159,12 +159,6 @@ This makes it a **complete AI + Software Engineering project**, suitable for rea
 
 ---
 
-## 📄 License
-
-This project is licensed under the MIT License.
-
----
-
 ## 🙌 Final Note
 
 This project demonstrates how **Artificial Intelligence + Software Engineering + Deployment** can be combined to build a real-world **network security solution**.
