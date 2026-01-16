@@ -22,8 +22,23 @@ This project implements a **Machine Learning pipeline for network security detec
   4. Model Training
   5. Streamlit Deployment for prediction
 
-- **Tech Stack:** Python, Pandas, NumPy, Scikit-learn, XGBoost, MongoDB, Streamlit, Joblib
-- **Design Patterns:** Modular pipeline, artifact-based workflow, exception handling, and logging.
+## 🔹 Tech Stack
+- **Programming & Libraries:** Python, Pandas, NumPy, Scikit-learn  
+- **Data Storage:** MongoDB  
+- **Deployment & Orchestration:** Streamlit, Docker, MLflow  
+- **Version Control:** Git / GitHub
+
+## 🔹 Evaluation Metrics
+
+**Mean Squared Error (MSE):**  
+MSE = sum((y_true - y_pred)^2) / n
+
+**Mean Absolute Error (MAE):**  
+MAE = sum(|y_true - y_pred|) / n
+
+**R² Score:**  
+R² = 1 - sum((y_true - y_pred)^2) / sum((y_true - mean(y_true))^2)
+
 
 
 ---
