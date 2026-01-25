@@ -1,223 +1,288 @@
-# Network Security in AI
+# Network Security in AI  
+**A Research-Oriented Machine Learning Pipeline for Network Risk Prediction**
 
 🔗 **Live Deployment**  
 👉 https://nagane09-network-security-in-ai-app-jbhxfu.streamlit.app/
 
 ---
 
-# 🛡️ NetworkSecurity ML Project
+## Abstract
 
-This project implements a **Machine Learning pipeline for network security detection**. It fetches network data from MongoDB, performs preprocessing, trains ML models, and provides **real-time predictions via a Streamlit web application**.
+Network security systems increasingly rely on data-driven methods to detect anomalous or malicious behavior in large-scale network traffic. This project presents an **end-to-end, research-oriented machine learning pipeline** for predicting network security risk scores from historical network logs.  
+
+The proposed system integrates **data ingestion from MongoDB**, **schema validation**, **robust preprocessing with missing-value imputation**, and **comparative model evaluation**, culminating in a deployed **Streamlit-based inference application**. Emphasis is placed on **reproducibility, modularity, and quantitative evaluation**, aligning with best practices in applied data science research.
 
 ---
 
-## 🔹 Project Overview
+## 1. Introduction & Motivation
 
-- **Objective:** Predict network security issues based on historical network logs.
-- **Approach:** Build a robust ML pipeline with data ingestion, validation, transformation, model training, and real-time inference.
-- **Pipeline Stages:**
-  1. Data Ingestion
-  2. Data Validation
-  3. Data Transformation
-  4. Model Training
-  5. Streamlit Deployment for prediction
+Modern networks generate massive volumes of heterogeneous logs containing missing values, noise, and schema inconsistencies. Traditional rule-based security systems struggle to scale and adapt to such complexity.  
 
-## 🔹 Tech Stack
-- **Programming & Libraries:** Python, Pandas, NumPy, Scikit-learn  
+This project investigates whether **supervised machine learning models**, trained on historical network telemetry, can reliably predict a continuous **network security risk score**, enabling early detection and prioritization of potential threats.
+
+Key research questions addressed:
+
+- Can structured ML pipelines handle real-world, imperfect network data?
+- How do ensemble-based models (e.g., XGBoost) compare to classical approaches?
+- Can the pipeline be made reproducible and deployable for real-time inference?
+
+---
+
+## 2. System Architecture Overview
+
+The system follows a **modular ML pipeline architecture**, inspired by production-grade and research workflows:
+
+1. Data Ingestion (MongoDB)
+2. Data Validation (Schema & consistency checks)
+3. Data Transformation (Imputation & preprocessing)
+4. Model Training & Evaluation
+5. Deployment for Real-Time Inference (Streamlit)
+
+Each stage produces explicit **artifacts**, enabling traceability and reproducibility.
+
+---
+
+## 3. Tech Stack
+
+- **Programming Language:** Python  
+- **Core Libraries:** NumPy, Pandas, Scikit-learn  
+- **Modeling:** XGBoost  
 - **Data Storage:** MongoDB  
-- **Deployment & Orchestration:** Streamlit, Docker, MLflow  
-- **Version Control:** Git / GitHub
-
-## 🔹 Evaluation Metrics
-
-**Mean Squared Error (MSE):**  
-MSE = sum((y_true - y_pred)^2) / n
-
-**Mean Absolute Error (MAE):**  
-MAE = sum(|y_true - y_pred|) / n
-
-**R² Score:**  
-R² = 1 - sum((y_true - y_pred)^2) / sum((y_true - mean(y_true))^2)
-
-
+- **Experiment Tracking:** MLflow  
+- **Deployment:** Streamlit  
+- **Version Control:** Git / GitHub  
 
 ---
 
-## 1️⃣ Data Ingestion
+## 4. Evaluation Metrics
 
-**File:** `components/data_ingestion.py`  
-**Purpose:** Fetch data from MongoDB, clean, and store in local CSV. Split dataset into train/test.
+Model performance is evaluated using standard regression metrics:
 
-**Technical Details:**
-- Connects to MongoDB using `pymongo` with SSL verification (`certifi`).
-- Reads collection into a Pandas DataFrame.
-- Drops `_id` column and replaces `"na"` with `np.nan`.
-- Stores raw data in **feature store**.
-- Splits dataset using `train_test_split` from Scikit-learn.
-- **Logging:** Records steps like fetching, cleaning, storing, and splitting.
-- **Exception Handling:** Raises `NetworkSecurityException` on any failure.
+- **Mean Squared Error (MSE)**  
+  \[
+  \text{MSE} = \frac{1}{n} \sum_{i=1}^{n} (y_i - \hat{y}_i)^2
+  \]
 
-**Artifact:** `DataIngestionArtifact` containing train/test CSV paths.
+- **Mean Absolute Error (MAE)**  
+  \[
+  \text{MAE} = \frac{1}{n} \sum_{i=1}^{n} |y_i - \hat{y}_i|
+  \]
 
----
+- **Coefficient of Determination (R²)**  
+  \[
+  R^2 = 1 - \frac{\sum (y_i - \hat{y}_i)^2}{\sum (y_i - \bar{y})^2}
+  \]
 
-## 2️⃣ Data Validation
-
-**File:** `components/data_validation.py`  
-**Purpose:** Ensure the data quality and schema correctness before ML.
-
-**Technical Details:**
-- Validates required columns, target presence, and missing values.
-- Detects schema mismatches and invalid entries.
-- Produces cleaned train/test files ready for transformation.
-- Logs all validation steps.
-- Handles errors with `NetworkSecurityException`.
-
-**Artifact:** `DataValidationArtifact` with validated train/test file paths.
+These metrics provide complementary perspectives on prediction accuracy and variance explanation.
 
 ---
 
-## 3️⃣ Data Transformation
+## 5. Data Ingestion
 
-**File:** `components/data_transformation.py`  
-**Purpose:** Preprocess input features for ML training.
+**File:** `components/data_ingestion.py`
 
-**Technical Details:**
-- **Feature Selection:** Drops target column from input features.
-- **Target Cleaning:** Replaces `-1` in target column with `0` (binary label correction).
-- **Imputation:** Uses `KNNImputer` (with `n_neighbors=3`) to fill missing values.
-- **Pipeline:** Preprocessing pipeline using `Pipeline` from Scikit-learn.
-- **Scaling/Normalization:** Optional addition of `StandardScaler` or other transformers.
-- **Transformation:** Applies pipeline to train and test datasets.
-- **Concatenation:** Combines transformed features with target labels for model consumption.
-- **Persistence:** Saves transformed data as `.npy` arrays, preprocessor as `.pkl`.
+### Objective
+Ingest raw network security data from MongoDB and prepare train/test splits.
 
-**Artifact:** `DataTransformationArtifact` with paths to:
-- Transformed train/test arrays
-- Preprocessor object (`preprocessor.pkl`)
+### Methodology
+- Secure MongoDB connection via `pymongo` with TLS certification (`certifi`)
+- Conversion of MongoDB collections to Pandas DataFrames
+- Removal of database-specific identifiers (`_id`)
+- Normalization of missing values (`"na"` → `np.nan`)
+- Storage in a local feature store
+- Stratified train–test split using Scikit-learn
 
----
-
-## 4️⃣ Model Training
-
-**File:** `components/model_trainer.py`  
-**Purpose:** Train ML models and generate predictions.
-
-**Technical Details:**
-- Models Tested: Random Forest, Gradient Boosting, XGBoost
-- Final Selected Model: **XGBoost Regressor (`XGBRegressor`)**
-- Hyperparameters: Tuned manually or via grid search
-- Features used: All preprocessed network features
-- Evaluation Metrics:
-  - **MSE:** Mean Squared Error
-  - **MAE:** Mean Absolute Error
-  - **R² Score:** Model performance
-- Model persistence: Saves trained model as `model.pkl`
-- Logs training progress, evaluation metrics, and errors.
-
-**Artifact:** `ModelTrainerArtifact` containing trained model path and metrics.
+### Output Artifact
+- `DataIngestionArtifact`
+  - Train dataset path
+  - Test dataset path
 
 ---
 
-## 🔹 Model Training
+## 6. Data Validation
 
-- **Models Tested:**
-  - Random Forest Regressor
-  - Gradient Boosting Regressor
-  - **XGBoost Regressor (Selected)**
+**File:** `components/data_validation.py`
 
-- **Final Model:** `XGBRegressor`  
-  **Hyperparameters:**
-  ```python
-  XGBRegressor(
-      n_estimators=1000,
-      learning_rate=0.03,
-      max_depth=6,
-      subsample=0.8,
-      colsample_bytree=0.8,
-      tree_method="hist",
-      random_state=42
-  )
-  `````
+### Objective
+Ensure structural and semantic integrity of the dataset prior to modeling.
 
-------
+### Validation Checks
+- Presence of required input and target columns
+- Schema consistency between train and test splits
+- Detection of invalid or missing target labels
+- Logging of anomalies and inconsistencies
 
-## 📊 Model Validation Metrics (Test Set)
-
-- **Mean Squared Error (MSE):** 0.00317  
-- **Mean Absolute Error (MAE):** 0.0437  
-- **R² Score:** 0.8852  
+### Output Artifact
+- `DataValidationArtifact`
+  - Validated train dataset
+  - Validated test dataset
 
 ---
 
-## 💾 Artifacts Saved
+## 7. Data Transformation
 
-- `model.pkl` → Trained XGBoost model  
-- `preprocessor.pkl` → Data transformation pipeline (KNNImputer + preprocessing)
+**File:** `components/data_transformation.py`
 
+### Objective
+Transform raw tabular data into a model-ready numerical representation.
 
-------
-## 5️⃣ Training Pipeline Orchestration
+### Methodology
+- Separation of features and target variable
+- Target correction (`-1 → 0`) to ensure binary consistency
+- Missing-value imputation using **KNNImputer (k = 3)**
+- Construction of a Scikit-learn preprocessing pipeline
+- Transformation of both training and testing datasets
+- Persistence of preprocessing objects for reproducibility
 
-**File:** `pipeline/training_pipeline.py`  
-**Purpose:** Centralized orchestration of all pipeline steps.
-
-**Technical Details:**
-- Initializes `TrainingPipelineConfig`.
-- Executes stages sequentially:
-  1. Data Ingestion
-  2. Data Validation
-  3. Data Transformation
-  4. Model Training
-- Returns `ModelTrainerArtifact` at the end.
-- Logging records start/end of each stage.
-- All exceptions are wrapped in `NetworkSecurityException`.
+### Output Artifacts
+- `transformed_train.npy`
+- `transformed_test.npy`
+- `preprocessor.pkl`
 
 ---
 
-## 6️⃣ MongoDB Integration
+## 8. Model Training & Selection
 
-- Connection using `pymongo` with environment variable `MONGODB_URL_KEY`.
-- Example:
+**File:** `components/model_trainer.py`
+
+### Candidate Models
+- Random Forest Regressor
+- Gradient Boosting Regressor
+- **XGBoost Regressor (Selected)**
+
+### Final Model Configuration
+
+```python
+XGBRegressor(
+    n_estimators=1000,
+    learning_rate=0.03,
+    max_depth=6,
+    subsample=0.8,
+    colsample_bytree=0.8,
+    tree_method="hist",
+    random_state=42
+)
+````
+
+### Model Selection Rationale
+
+The **XGBoost Regressor** was selected as the final model due to the following properties:
+
+- **Ability to model non-linear feature interactions**, which are common in network traffic data.
+- **Robustness to noisy and partially missing data**, especially when combined with prior imputation.
+- **Strong empirical performance on structured tabular datasets**, consistently outperforming baseline ensemble models in preliminary experiments.
+
+**Output Artifact**
+- `model.pkl` → Serialized trained XGBoost model
+
+---
+
+## 9. Experimental Results
+
+### Test Set Performance
+
+| Metric | Value |
+|------|------|
+| Mean Squared Error (MSE) | 0.00317 |
+| Mean Absolute Error (MAE) | 0.0437 |
+| R² Score | 0.8852 |
+
+The high **R² score (0.8852)** indicates that the model explains a substantial proportion of the variance in network security risk, demonstrating strong generalization performance on unseen data.
+
+---
+
+## 10. Training Pipeline Orchestration
+
+**File:** `pipeline/training_pipeline.py`
+
+### Description
+
+The training pipeline orchestrates all stages of the machine learning workflow in a **deterministic and reproducible** manner. Each stage produces explicit artifacts, enabling traceability and modular experimentation.
+
+### Pipeline Stages
+
+1. Data Ingestion  
+2. Data Validation  
+3. Data Transformation  
+4. Model Training  
+
+All intermediate outputs are **logged, versioned, and persisted** for reproducibility and debugging.
+
+---
+
+## 11. MongoDB Integration
+
+MongoDB is accessed using **environment-based configuration**, ensuring security and deployment flexibility.
 
 ```python
 import pymongo, certifi
+
 ca = certifi.where()
 client = pymongo.MongoClient(mongo_db_url, tlsCAFile=ca)
 collection = client[DB_NAME][COLLECTION_NAME]
 ```
 
-----
+This approach ensures:
 
-## 7️⃣ Logging and Exception Handling
-
-- **Logging:**  
-  Every step of data ingestion, validation, transformation, and model training is logged using `logger.py` for traceability and debugging.
-
-- **Exception Handling:**  
-  Critical functions are wrapped in `try/except` blocks, raising `NetworkSecurityException` to ensure proper error tracking and debugging.
+- **Secure TLS-based communication** between the application and the database  
+- **Decoupling of credentials from source code** via environment variables  
+- **Easy adaptation across development and production environments**
 
 ---
 
-## 8️⃣ Streamlit Deployment
+## 12. Logging & Exception Handling
 
-- **File:** `app.py`  
-- **Purpose:** Provides a user interface for model training and real-time predictions.
+### Logging
 
-### Features:
+A centralized logging mechanism captures detailed execution traces for each pipeline stage. This supports:
 
-1. **Train Model:**  
-   Runs the full pipeline from data ingestion to model training.
+- Systematic debugging  
+- Runtime monitoring  
+- Experiment auditability and reproducibility  
 
-2. **Predict:**  
-   - Upload CSV → Preprocess → Predict → Save results.  
-   - Predictions are saved in `prediction_output/output.csv`.
+### Exception Handling
 
-### Workflow Example:
+All critical operations are wrapped in `try/except` blocks and raise a custom exception:
+
+- `NetworkSecurityException`
+
+This design ensures **consistent error propagation**, improved debuggability, and clean failure handling across the entire pipeline.
+
+---
+
+## 13. Streamlit Deployment
+
+**File:** `app.py`
+
+### Functionality
+
+- End-to-end model training via a graphical user interface  
+- CSV-based batch inference for offline evaluation  
+- Automatic persistence of prediction results  
+
+### Inference Workflow
 
 ```python
 preprocessor = load_object("final_model/preprocessor.pkl")
 model = load_object("final_model/model.pkl")
-network_model = NetworkModel(preprocessor=preprocessor, model=model)
-y_pred = network_model.predict(input_df)
+
+network_model = NetworkModel(
+    preprocessor=preprocessor,
+    model=model
+)
 ````
+predictions = network_model.predict(input_df)
+Predictions are automatically stored for downstream analysis and evaluation.
+
+## 14. Limitations & Future Work
+
+While the current system demonstrates strong empirical performance, several research-oriented extensions are planned:
+
+- **Incorporation of temporal sequence models** (LSTM, Temporal CNNs, Transformers) to capture sequential patterns in network traffic  
+- **Cost-sensitive learning** to minimize false negatives in security-critical scenarios  
+- **Adversarial robustness evaluation** against evasion and poisoning attacks  
+- **Formal statistical significance testing** across model variants to ensure robust conclusions  
+- **Fairness and bias analysis** in network security predictions to ensure equitable performance  
+
+These directions align the project with ongoing research challenges in **applied machine learning for cybersecurity**.
+
