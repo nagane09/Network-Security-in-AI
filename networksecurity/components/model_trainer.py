@@ -6,7 +6,14 @@ from networksecurity.logging.logger import logging
 from networksecurity.entity.artifact_entity import DataTransformationArtifact, ModelTrainerArtifact
 from networksecurity.entity.config_entity import ModelTrainerConfig
 
-import mlflow
+# ===== Patch MLflow import =====
+try:
+    import mlflow
+    MLFLOW_AVAILABLE = True
+except Exception:
+    MLFLOW_AVAILABLE = False
+# ================================
+
 from networksecurity.utils.ml_utils.model.estimator import NetworkModel
 from networksecurity.utils.main_utils.utils import save_object, load_object, load_numpy_array_data, evaluate_models
 from networksecurity.utils.ml_utils.metric.classification_metric import get_classification_score
@@ -16,8 +23,9 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import AdaBoostClassifier, GradientBoostingClassifier, RandomForestClassifier
 
-# Use local MLflow tracking (Option 1)
-os.environ["MLFLOW_TRACKING_URI"] = "file:///C:/Users/Admin/mlruns"
+# Use local MLflow tracking (optional)
+if MLFLOW_AVAILABLE:
+    os.environ["MLFLOW_TRACKING_URI"] = "file:///C:/Users/Admin/mlruns"
 
 class ModelTrainer:
     def __init__(self, model_trainer_config: ModelTrainerConfig, data_transformation_artifact: DataTransformationArtifact):
@@ -29,6 +37,10 @@ class ModelTrainer:
 
     def track_mlflow(self, best_model, classificationmetric, run_name="run"):
         """Log metrics and model locally using MLflow"""
+        if not MLFLOW_AVAILABLE:
+            logging.warning("MLflow not available, skipping MLflow tracking")
+            return
+
         try:
             mlflow.set_experiment("NetworkSecurity_Experiment")  # same experiment name always
             with mlflow.start_run(run_name=run_name):
