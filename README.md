@@ -87,13 +87,29 @@ The pipeline is composed of four major stages:
 
 **Artifact Generated:** `ModelTrainerArtifact` including trained model path and classification metrics.
 
-## 3. Random Forest: Overview, Working, and Advantages
+# 3.Model Evaluation Report
 
-### 3.1 What is Random Forest?
+## Model: Random Forest Classifier
+
+The Random Forest model was evaluated on the test dataset using the saved model from the `final_model` folder. Feature transformations applied during training were applied consistently to the test data using the saved preprocessor.
+
+### Evaluation Metric
+
+| Metric   | Value |
+|---------|-------|
+| Accuracy | 0.99  |
+
+> The model achieved **99% accuracy** on the test dataset, indicating that it correctly classified 99% of the network events.
+
+
+
+##4. Random Forest: Overview, Working, and Advantages
+
+###  What is Random Forest?
 
 Random Forest is an ensemble machine learning algorithm used for both classification and regression tasks. It combines multiple decision trees to make more accurate and stable predictions. Instead of relying on a single tree (which can overfit), Random Forest builds a “forest” of trees and aggregates their outputs.
 
-### 3.2 How Random Forest Works
+###  How Random Forest Works
 
 1. **Bootstrap Sampling:** Multiple subsets of the training data are created by random sampling with replacement.
 2. **Decision Tree Construction:** A decision tree is trained on each subset.
@@ -104,7 +120,7 @@ Random Forest is an ensemble machine learning algorithm used for both classifica
 
 
 
-### 3.3 Advantages of Random Forest
+###  Advantages of Random Forest
 
 - **Robustness to Overfitting:** Aggregating multiple trees reduces variance and improves generalization.
 - **Handles Missing Data:** Can handle missing values better than many other algorithms.
